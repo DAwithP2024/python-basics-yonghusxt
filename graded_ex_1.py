@@ -33,9 +33,9 @@ products = {
 
 
 def display_sorted_products(products_list, sort_order):
-    if sort_order == 1:
+    if sort_order == "asc":
         sorted_products = sorted(products_list, key=lambda x: x[1])
-    elif sort_order == 2:
+    elif sort_order == "desc":
         sorted_products = sorted(products_list, key=lambda x: x[1], reverse=True)
     return sorted_products
 
@@ -47,10 +47,22 @@ def display_products(products_list):
 
 
 def display_categories():
-    categories = list(products.keys())
-    for index, category in enumerate(categories, start=1):
-        print(f"{index}. {category}")
-
+    i=input('Please enter the number of varieties you want to see, which must be less than or equal to 3:')
+    check=i.isdigit()
+    if check:
+        i=int(i)
+        categories = list(products.keys())
+        if i<=len(categories):
+             for index, category in enumerate(categories, start=1):
+                 print(f"{index}. {category}")
+                 if i==index:
+                     break
+        else:
+            return None
+        return i-1
+    else:
+        return None
+           
 def add_to_cart(cart, product, quantity):
     name, price = product
     new_product = (name, price, quantity)
@@ -60,8 +72,10 @@ def display_cart(cart):
     total=0
     for index, product in enumerate(cart, start=1):
         name, price,quantity = product
-        print(f"{index}. {name} - price:{price} quantity:{quantity}")
+        # print(f"{index}. {name} - price:{price} quantity:{quantity}")
+        print(f"{name} - ${price} x {quantity} = ${price*quantity}")
         total=total+price*quantity
+    print(f"Total cost: ${total}")
     return total
 
 
@@ -69,7 +83,9 @@ def generate_receipt(name, email, cart, total_cost, address):
     print("Name:", name)
     print("Email:", email)
     print("Items Purchased:")
-    display_cart(cart)
+    for index, product in enumerate(cart, start=1):
+        name, price,quantity = product
+        print(f"{index}. {name} - price:{price} quantity:{quantity}")
     print("Total Cost: $", total_cost)
     print("Delivery Address:", address)
     print("Your items will be delivered in 3 days. Payment will be accepted after successful delivery.")
@@ -86,7 +102,7 @@ def validate_name(name):
     return True
 
 def validate_email(email):
-    email_pattern = r"^[a-z0-9][\w.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$"
+    email_pattern = r'^[\w\.-]+@[\w\.-]'
     ret = re.match(email_pattern, email)
     if not ret:
         print("Please enter a correctly formatted email address.")
@@ -126,8 +142,8 @@ def main():
         check1 = validate_name(name)
     check2 = False
     while not check2:
-        email = input("Please input your email:")
-        check2 = validate_email(email)
+       email = input("Please input your email:")
+       check2 = validate_email(email)
     address = input("Please input your address:")
     print()
     product_name = while_number()
@@ -174,7 +190,10 @@ def main():
                     sort_order = input("Enter 1 for ascending order or 2 for descending order: ")
                     if sort_order.isdigit():
                          sort_order=int(sort_order)
-                         products[product_name]=display_sorted_products(products[product_name], sort_order)
+                         if sort_order==1:
+                             products[product_name]=display_sorted_products(products[product_name],"asc")
+                         elif sort_order==2:
+                             products[product_name]=display_sorted_products(products[product_name],"desc")
                          display_products(products[product_name])
                          break
                     else:
@@ -186,8 +205,8 @@ def main():
                 continue
             elif choice == 4:
                 if len(cart)>0:
+                    print(f"\ncart:")
                     total=display_cart(cart)
-                    print("Total Cost: $", total)
                     print()
                     print("---------------------------------------------")
                     print("Receipt:")
